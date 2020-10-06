@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30309.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharePriceAlerts", "SharePriceAlerts\SharePriceAlerts.csproj", "{24CBB2F2-ECA0-423B-A74F-CF2E1DE1EB51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24CBB2F2-ECA0-423B-A74F-CF2E1DE1EB51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24CBB2F2-ECA0-423B-A74F-CF2E1DE1EB51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24CBB2F2-ECA0-423B-A74F-CF2E1DE1EB51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24CBB2F2-ECA0-423B-A74F-CF2E1DE1EB51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E7A26F5-ED27-4D1F-9CDC-88F48A01E50C}
+	EndGlobalSection
+EndGlobal
