@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Exceptions;
     using Twilio;
     using Twilio.Rest.Api.V2010.Account;
     using Twilio.Types;
@@ -24,21 +25,28 @@
 
         private static void AlertByTextMessage(string failedSymbols)
         {
-            var ssid = Environment.GetEnvironmentVariable("twilioSsid");
-            var key = Environment.GetEnvironmentVariable("twilioKey");
+            try
+            {
+                var ssid = Environment.GetEnvironmentVariable("twilioSsid");
+                var key = Environment.GetEnvironmentVariable("twilioKey");
 
-            TwilioClient.Init(
+                TwilioClient.Init(
                     ssid,
                     key);
 
-            var fromNumber = Environment.GetEnvironmentVariable("twilioFromNumber");
-            var toNumber = Environment.GetEnvironmentVariable("twilioToNumber");
+                var fromNumber = Environment.GetEnvironmentVariable("twilioFromNumber");
+                var toNumber = Environment.GetEnvironmentVariable("twilioToNumber");
 
-            var message = MessageResource.Create(
-                body: $"Happy days {failedSymbols}",
-                from: new PhoneNumber(fromNumber),
-                to: new PhoneNumber(toNumber)
-            );
+                var _ = MessageResource.Create(
+                    body: $"Happy days {failedSymbols}",
+                    from: new PhoneNumber(fromNumber),
+                    to: new PhoneNumber(toNumber)
+                );
+            }
+            catch (Exception e)
+            {
+                throw new UnSuccessfulTwilioAlertException("Twilio Exception", e);
+            }
         }
     }
 }

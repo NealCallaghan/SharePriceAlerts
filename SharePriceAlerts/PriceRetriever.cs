@@ -19,7 +19,7 @@
 
             var latestPrice = response.IsSuccessStatusCode
                 ? GetLatestDailyData(JsonConvert.DeserializeObject<DailyData>(stream).TimeSeries)
-                : throw new UnSuccessfulAlphaResponse("Unsuccessful response from alphavantage api");
+                : throw new UnSuccessfulAlphaResponseException("Unsuccessful response from alphavantage api");
 
             return new DayPriceInformation
             {
