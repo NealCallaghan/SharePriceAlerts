@@ -17,8 +17,6 @@ namespace SharePriceAlerts
         [FunctionName("SharePriceAlerterFunction")]
         public static async Task Run([TimerTrigger("0 0 9-17 * * 1-5")]TimerInfo myTimer, ILogger log)
         {
-            log.LogInformation($"Share Price function started executing at: {DateTime.Now}");
-
             var executeCatchAllWithLogger = ExecuteCatchAll(log);
 
             await executeCatchAllWithLogger(async () =>
@@ -36,8 +34,6 @@ namespace SharePriceAlerts
 
                 AlertWhereRequired(ruleOutcomes);
             });
-
-            log.LogInformation($"Share Price function finished executing at: {DateTime.Now}");
         }
 
         private static Func<Action, Task> ExecuteCatchAll(ILogger log) =>
@@ -45,19 +41,21 @@ namespace SharePriceAlerts
             {
                 try
                 {
+                    log.LogInformation($"Share Price function started executing at: {DateTime.Now}");
                     await Task.Run(func);
+                    log.LogInformation($"Share Price function finished executing at: {DateTime.Now}");
                 }
                 catch (MissingRuleException e)
                 {
-                    log.LogWarning(e, "Share symbol found with no rule");
+                    log.LogError(e, "Share symbol found with no rule");
                 }
                 catch (UnSuccessfulAlphaResponseException e)
                 {
-                    log.LogWarning(e, $"Issue with getting information from Alpha Vantage at {DateTime.Now}");
+                    log.LogError(e, $"Issue with getting information from Alpha Vantage at {DateTime.Now}");
                 }
                 catch (UnSuccessfulTwilioAlertException e)
                 {
-                    log.LogWarning(e, $"Issue with alerting through twilio at {DateTime.Now}");
+                    log.LogError(e, $"Issue with alerting through twilio at {DateTime.Now}");
                 }
                 catch (Exception e)
                 {
