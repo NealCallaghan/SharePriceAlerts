@@ -2,7 +2,6 @@ namespace SharePriceAlerts
 {
     using System;
     using System.Linq;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Exceptions;
     using Microsoft.Azure.WebJobs;
@@ -15,28 +14,28 @@ namespace SharePriceAlerts
     public static class SharePriceAlerterFunction
     {
         [FunctionName("SharePriceAlerterFunction")]
-        public static async Task Run([TimerTrigger("0 0 9-17 * * 1-5")]TimerInfo myTimer, ILogger log)
+        public static async Task Run([TimerTrigger("0 0 9-17 * * 1-5")]TimerInfo _, ILogger log)
         {
-            var executeCatchAllWithLogger = ExecuteCatchAll(log);
+            var httpClientFactory = new HttpClientFactory();
+            var executeCatchAllWithLogger = ExecuteCatchAll(new SharePriceAlertLogger(log, httpClientFactory));
 
             await executeCatchAllWithLogger(async () =>
             {
-                var outComeTestsAndSymbols = GetAllTests();
+                var outComeTestsAndSymbols = SymbolToTestDictionary();
                 var getPriceOutcomes = DetermineRuleDetails(outComeTestsAndSymbols);
 
-                using var client = new HttpClient();
-                var getDailyPriceWithClient = GetDailyPrice(client);
+                var getDailyPriceWithClient = GetDailyPrice(httpClientFactory.HttpClient);
                 var dailyPrices = outComeTestsAndSymbols.Keys.Select(getDailyPriceWithClient);
 
                 var dayPriceInformation = await Task.WhenAll(dailyPrices);
 
                 var ruleOutcomes = getPriceOutcomes(dayPriceInformation);
 
-                AlertWhereRequired(ruleOutcomes);
+                await AlertWhereRequired(httpClientFactory.HttpClient, ruleOutcomes);
             });
         }
 
-        private static Func<Action, Task> ExecuteCatchAll(ILogger log) =>
+        private static Func<Action, Task> ExecuteCatchAll(ISharePriceAlertLogger log) =>
             async func =>
             {
                 try
@@ -47,19 +46,23 @@ namespace SharePriceAlerts
                 }
                 catch (MissingRuleException e)
                 {
-                    log.LogError(e, "Share symbol found with no rule");
+                    await log.LogError(e, "Share symbol found with no rule");
                 }
                 catch (UnSuccessfulAlphaResponseException e)
                 {
-                    log.LogError(e, $"Issue with getting information from Alpha Vantage at {DateTime.Now}");
+                    await log.LogError(e, $"Issue with getting information from Alpha Vantage at {DateTime.Now}");
                 }
                 catch (UnSuccessfulTwilioAlertException e)
                 {
-                    log.LogError(e, $"Issue with alerting through twilio at {DateTime.Now}");
+                    await log.LogError(e, $"Issue with alerting through twilio at {DateTime.Now}");
+                }
+                catch (UnSuccessfulSlackException e)
+                {
+                    await log.LogError(e, $"Issue with alerting through slack at {DateTime.Now}");
                 }
                 catch (Exception e)
                 {
-                    log.LogCritical(e, $"Critical exception thrown at {DateTime.Now}");
+                    await log.LogCritical(e, $"Critical exception thrown at {DateTime.Now}");
                 }
             };
     }

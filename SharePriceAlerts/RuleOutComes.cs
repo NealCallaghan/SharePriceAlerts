@@ -6,7 +6,7 @@
 
     public static class RuleOutComes
     {
-        public static GetAllTests GetAllTests = () =>
+        public static SymbolToTestDictionary SymbolToTestDictionary = () =>
         {
             return new Dictionary<string, PriceInformationTest>
             {

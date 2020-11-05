@@ -9,6 +9,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="SlackNotifications.Models">
+      <HintPath>..\SlackNotifications.Models\bin\Release\netstandard2.0\SlackNotifications.Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
