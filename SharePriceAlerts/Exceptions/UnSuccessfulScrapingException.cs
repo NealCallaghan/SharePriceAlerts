@@ -3,9 +3,9 @@
     using System;
 
     [Serializable]
-    public class UnSuccessfulAlphaResponseException : Exception
+    public class UnSuccessfulScrapingException : Exception
     {
-        public UnSuccessfulAlphaResponseException(string message)
+        public UnSuccessfulScrapingException(string message)
             : base(message) { }
     }
 }

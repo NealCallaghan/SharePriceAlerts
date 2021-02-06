@@ -7,6 +7,7 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Twilio" Version="3.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="ScrapySharp" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SlackNotifications.Models">

@@ -7,7 +7,7 @@
         [JsonProperty(PropertyName = "1. Information")]
         public string Information { get; set; }
 
-        [JsonProperty(PropertyName = "2. Symbol")]
+        [JsonProperty(PropertyName = "2. WebAddress")]
         public string Symbol { get; set; }
 
         [JsonProperty(PropertyName = "3. Last Refreshed")]

@@ -3,27 +3,26 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Http;
     using Exceptions;
     using Models;
-    using Newtonsoft.Json;
+    using ScrapySharp.Extensions;
 
     public static class PriceRetriever
     {
-        public static DailyPriceGetter GetDailyPrice = client => async symbol =>
+        public static DailyPriceGetter GetDailyPrice = browser => async ((string webAddress, string symbol) tuple) =>
         {
-            var apiKey = Environment.GetEnvironmentVariable("alphavantageApiKey");
-            using var request = new HttpRequestMessage(HttpMethod.Get, GetRequestUrl(symbol, apiKey));
-            using var response = await client.SendAsync(request);
-            var stream = await response.Content.ReadAsStringAsync();
+            var (webAddress, symbol) = tuple;
 
-            var latestPrice = response.IsSuccessStatusCode
-                ? GetLatestDailyData(JsonConvert.DeserializeObject<DailyData>(stream).TimeSeries)
-                : throw new UnSuccessfulAlphaResponseException("Unsuccessful response from alphavantage api");
+            var pageResult = await browser.NavigateToPageAsync(new Uri(webAddress));
+            var priceNode = pageResult.Html.CssSelect(".ml-1")?.First();
+
+            if(priceNode == null || !decimal.TryParse(priceNode.InnerText.Trim().Replace("p", string.Empty), out var dailyPrice))
+                throw new UnSuccessfulScrapingException($"Unable to scrape: {symbol} {webAddress}");
 
             return new DayPriceInformation
             {
-                DailyPrice = latestPrice,
+                DailyPrice = dailyPrice,
+                WebAddress = webAddress,
                 Symbol = symbol,
             };
         };

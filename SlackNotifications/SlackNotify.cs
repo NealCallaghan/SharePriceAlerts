@@ -32,6 +32,7 @@ namespace SlackNotifications
             return new StatusCodeResult((int)result);
         }
 
+
         private static async Task<T> RetrieveObjectFromRequestBody<T>(Stream body)
         {
             var requestBody = await new StreamReader(body).ReadToEndAsync();

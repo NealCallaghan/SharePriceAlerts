@@ -6,6 +6,7 @@ namespace SharePriceAlerts
     using Exceptions;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
+    using ScrapySharp.Network;
 
     using static PriceRetriever;
     using static RuleOutComes;
@@ -14,7 +15,7 @@ namespace SharePriceAlerts
     public static class SharePriceAlerterFunction
     {
         [FunctionName("SharePriceAlerterFunction")]
-        public static async Task Run([TimerTrigger("0 0 9-17 * * 1-5")]TimerInfo _, ILogger log)
+        public static async Task Run([TimerTrigger("0 0 9-17 * * 1-5")]TimerInfo timer, ILogger log)
         {
             var httpClientFactory = new HttpClientFactory();
             var executeCatchAllWithLogger = ExecuteCatchAll(new SharePriceAlertLogger(log, httpClientFactory));
@@ -24,8 +25,8 @@ namespace SharePriceAlerts
                 var outComeTestsAndSymbols = SymbolToTestDictionary();
                 var getPriceOutcomes = DetermineRuleDetails(outComeTestsAndSymbols);
 
-                var getDailyPriceWithClient = GetDailyPrice(httpClientFactory.HttpClient);
-                var dailyPrices = outComeTestsAndSymbols.Keys.Select(getDailyPriceWithClient);
+                var getDailyPriceWithBrowser = GetDailyPrice(new ScrapingBrowser());
+                var dailyPrices = outComeTestsAndSymbols.Keys.Select(getDailyPriceWithBrowser);
 
                 var dayPriceInformation = await Task.WhenAll(dailyPrices);
 
@@ -48,9 +49,9 @@ namespace SharePriceAlerts
                 {
                     await log.LogError(e, "Share symbol found with no rule");
                 }
-                catch (UnSuccessfulAlphaResponseException e)
+                catch (UnSuccessfulScrapingException e)
                 {
-                    await log.LogError(e, $"Issue with getting information from Alpha Vantage at {DateTime.Now}");
+                    await log.LogError(e, $"Issue with getting information from Scraper at {DateTime.Now}");
                 }
                 catch (UnSuccessfulTwilioAlertException e)
                 {
@@ -58,7 +59,7 @@ namespace SharePriceAlerts
                 }
                 catch (UnSuccessfulSlackException e)
                 {
-                    await log.LogError(e, $"Issue with alerting through slack at {DateTime.Now}");
+                    await log.LogCritical(e, $"Issue with alerting through slack at {DateTime.Now}");
                 }
                 catch (Exception e)
                 {

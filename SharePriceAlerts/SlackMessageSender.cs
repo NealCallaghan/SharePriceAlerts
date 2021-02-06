@@ -29,7 +29,7 @@
         {
             try
             {
-                return SendMessage(client, AlertLevel.Normal, $"Happy days {symbols}");
+                return SendMessage(client, AlertLevel.Normal, $"Share price alert {symbols}");
             }
             catch (Exception e)
             {
